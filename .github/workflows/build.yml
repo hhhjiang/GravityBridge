@@ -10,20 +10,26 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.10"
 
       - name: Install dependencies
         run: |
-          pip install pyinstaller pyside6
+          python -m pip install --upgrade pip
+          pip install pyinstaller PySide6
 
-      - name: Build exe
+      - name: Build exe with PyInstaller
         run: |
-          pyinstaller --noconsole --onefile main.py --name GravityBridge
+          pyinstaller main.py ^
+            --onefile ^
+            --console ^
+            --name GravityBridge ^
+            --collect-all PySide6
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
