@@ -25,11 +25,7 @@ jobs:
 
       - name: Build exe with PyInstaller
         run: |
-          pyinstaller main.py ^
-            --onefile ^
-            --console ^
-            --name GravityBridge ^
-            --collect-all PySide6
+          pyinstaller main.py --onefile --console --name GravityBridge --collect-all PySide6
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
