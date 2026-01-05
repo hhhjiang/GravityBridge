@@ -1,44 +1,40 @@
 import sys
 import os
-
 from PySide6.QtWidgets import QApplication, QSystemTrayIcon, QMenu
 from PySide6.QtGui import QAction, QIcon
+from PySide6.QtCore import QCoreApplication
 
 
-def resource_path(relative_path):
+def resource_path(relative_path: str) -> str:
     """
-    兼容 PyInstaller 的资源路径
+    PyInstaller 运行时，资源会被解压到 _MEIPASS
+    开发态 / 打包态 都能正确找到 icon
     """
-    try:
-        base_path = sys._MEIPASS
-    except Exception:
-        base_path = os.path.abspath(".")
-
-    return os.path.join(base_path, relative_path)
+    if hasattr(sys, "_MEIPASS"):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)
 
 
 def main():
+    QCoreApplication.setApplicationName("GravityBridge")
+
     app = QApplication(sys.argv)
-    app.setQuitOnLastWindowClosed(False)
 
     icon_path = resource_path("icon.ico")
-
     if not os.path.exists(icon_path):
-        # 最后兜底：直接退出并提示
         from PySide6.QtWidgets import QMessageBox
-        QMessageBox.critical(
-            None,
-            "GravityBridge Error",
-            f"icon.ico not found:\n{icon_path}"
-        )
+        QMessageBox.critical(None, "GravityBridge Error", f"icon.ico not found:\n{icon_path}")
         sys.exit(1)
 
+    icon = QIcon(icon_path)
+
     tray = QSystemTrayIcon()
-    tray.setIcon(QIcon(icon_path))
+    tray.setIcon(icon)
+    tray.setToolTip("GravityBridge")
 
     menu = QMenu()
 
-    action_start = QAction("启动 Antigravity")
+    action_start = QAction("启动 GravityBridge")
     action_exit = QAction("退出")
 
     action_exit.triggered.connect(app.quit)
