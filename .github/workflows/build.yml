@@ -1,4 +1,4 @@
-name: Build Windows EXE
+name: Build GravityBridge
 
 on:
   push:
@@ -24,13 +24,7 @@ jobs:
           pip install pyinstaller PySide6
 
       - name: Build exe with PyInstaller
-        run: |
-          pyinstaller ^
-            --onefile ^
-            --noconsole ^
-            --name GravityBridge ^
-            --add-data "icon.ico;." ^
-            main.py
+        run: pyinstaller --onefile --noconsole --name GravityBridge --icon icon.ico --add-data "icon.ico;." main.py
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
