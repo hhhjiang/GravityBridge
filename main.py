@@ -1,23 +1,40 @@
 import sys
 import os
+
 from PySide6.QtWidgets import QApplication, QSystemTrayIcon, QMenu
 from PySide6.QtGui import QAction, QIcon
 
 
 def resource_path(relative_path):
     """
-    PyInstaller 打包后正确获取资源路径
+    兼容 PyInstaller 的资源路径
     """
-    if hasattr(sys, '_MEIPASS'):
-        return os.path.join(sys._MEIPASS, relative_path)
-    return os.path.join(os.path.abspath("."), relative_path)
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
 
 
 def main():
     app = QApplication(sys.argv)
+    app.setQuitOnLastWindowClosed(False)
 
     icon_path = resource_path("icon.ico")
-    tray_icon = QSystemTrayIcon(QIcon(icon_path))
+
+    if not os.path.exists(icon_path):
+        # 最后兜底：直接退出并提示
+        from PySide6.QtWidgets import QMessageBox
+        QMessageBox.critical(
+            None,
+            "GravityBridge Error",
+            f"icon.ico not found:\n{icon_path}"
+        )
+        sys.exit(1)
+
+    tray = QSystemTrayIcon()
+    tray.setIcon(QIcon(icon_path))
 
     menu = QMenu()
 
@@ -30,8 +47,8 @@ def main():
     menu.addSeparator()
     menu.addAction(action_exit)
 
-    tray_icon.setContextMenu(menu)
-    tray_icon.show()
+    tray.setContextMenu(menu)
+    tray.show()
 
     sys.exit(app.exec())
 
