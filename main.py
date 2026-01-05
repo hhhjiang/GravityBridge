@@ -1,35 +1,28 @@
 import sys
-import subprocess
-from PySide6.QtWidgets import QApplication, QSystemTrayIcon, QMenu, QAction
-from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import QApplication, QSystemTrayIcon, QMenu
+from PySide6.QtGui import QAction, QIcon
 
-APP_NAME = "GravityBridge"
-ANTIGRAVITY_EXE = "Antigravity.exe"  # 你电脑里真实的 Antigravity 路径稍后再优化
+def main():
+    app = QApplication(sys.argv)
 
-def start_antigravity():
-    try:
-        subprocess.Popen([ANTIGRAVITY_EXE], shell=True)
-    except Exception as e:
-        print(e)
+    tray = QSystemTrayIcon()
+    tray.setIcon(QIcon())  # 没 icon 也能跑
 
-app = QApplication(sys.argv)
-app.setQuitOnLastWindowClosed(False)
+    menu = QMenu()
 
-tray = QSystemTrayIcon()
-tray.setToolTip(APP_NAME)
-tray.setIcon(QIcon())  # 后面再加 Logo
+    action_start = QAction("启动 Antigravity")
+    action_exit = QAction("退出")
 
-menu = QMenu()
+    action_exit.triggered.connect(app.quit)
 
-start_action = QAction("启动 Antigravity")
-start_action.triggered.connect(start_antigravity)
-menu.addAction(start_action)
+    menu.addAction(action_start)
+    menu.addSeparator()
+    menu.addAction(action_exit)
 
-exit_action = QAction("退出")
-exit_action.triggered.connect(app.quit)
-menu.addAction(exit_action)
+    tray.setContextMenu(menu)
+    tray.show()
 
-tray.setContextMenu(menu)
-tray.show()
+    sys.exit(app.exec())
 
-sys.exit(app.exec())
+if __name__ == "__main__":
+    main()
