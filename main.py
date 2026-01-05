@@ -1,20 +1,23 @@
 import sys
 import os
 from PySide6.QtWidgets import QApplication, QSystemTrayIcon, QMenu
-from PySide6.QtGui import QIcon, QAction
+from PySide6.QtGui import QAction, QIcon
 
-def resource_path(filename):
-    # PyInstaller 兼容路径
-    if hasattr(sys, "_MEIPASS"):
-        return os.path.join(sys._MEIPASS, filename)
-    return os.path.join(os.path.abspath("."), filename)
+
+def resource_path(relative_path):
+    """
+    PyInstaller 打包后正确获取资源路径
+    """
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)
+
 
 def main():
     app = QApplication(sys.argv)
-    app.setQuitOnLastWindowClosed(False)
 
     icon_path = resource_path("icon.ico")
-    tray = QSystemTrayIcon(QIcon(icon_path))
+    tray_icon = QSystemTrayIcon(QIcon(icon_path))
 
     menu = QMenu()
 
@@ -27,10 +30,11 @@ def main():
     menu.addSeparator()
     menu.addAction(action_exit)
 
-    tray.setContextMenu(menu)
-    tray.show()
+    tray_icon.setContextMenu(menu)
+    tray_icon.show()
 
     sys.exit(app.exec())
+
 
 if __name__ == "__main__":
     main()
